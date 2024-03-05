@@ -31,6 +31,15 @@ namespace MvcCoreEmpleadosSession.Controllers
         public IActionResult SumaSalarios()
         {
             return View();
+        }        
+        public async Task<IActionResult> SessionEmpleados()
+        {
+            List<Empleado> empleados = await this.repo.GetEmpleadosAsync();
+            return View();
+        }
+        public IActionResult EmpleadosSession()
+        {
+            return View();
         }
     }
 }
