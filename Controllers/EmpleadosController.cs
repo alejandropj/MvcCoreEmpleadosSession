@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using MvcCoreEmpleadosSession.Extensions;
 using MvcCoreEmpleadosSession.Models;
 using MvcCoreEmpleadosSession.Repositories;
@@ -8,9 +9,11 @@ namespace MvcCoreEmpleadosSession.Controllers
     public class EmpleadosController : Controller
     {
         private RepositoryEmpleados repo;
-        public EmpleadosController(RepositoryEmpleados repo)
+        private IMemoryCache memoryCache;
+        public EmpleadosController(RepositoryEmpleados repo, IMemoryCache memoryCache)
         {
             this.repo = repo;
+            this.memoryCache = memoryCache;
         }     
         /* VERSION 1*/
         public async Task<IActionResult> SessionSalarios(int? salario)
@@ -54,9 +57,27 @@ namespace MvcCoreEmpleadosSession.Controllers
             }
             List<Empleado> empleados = await this.repo.GetEmpleadosAsync();
             return View(empleados);
-        }        
-        public async Task<IActionResult> SessionEmpleadosOk(int? idempleado)
+        }
+
+/*        [ResponseCache(Duration = 80, Location = ResponseCacheLocation.Client)]*/
+        public async Task<IActionResult> SessionEmpleadosOk(int? idempleado, int? idfavorito)
         {
+            if(idfavorito != null)
+            {
+                List<Empleado> empleadosFavoritos;
+                if (this.memoryCache.Get("FAVORITOS") == null)
+                {
+                    empleadosFavoritos = new List<Empleado>();
+                }
+                else
+                {
+                    empleadosFavoritos = this.memoryCache.Get<List<Empleado>>("FAVORITOS");
+                }
+                Empleado empleado = await this.repo.FindEmpleadoAsync(idfavorito.Value);
+                empleadosFavoritos.Add(empleado);
+                this.memoryCache.Set("FAVORITOS", empleadosFavoritos);
+            }
+
             if (idempleado != null)
             {
                 List<int> idsEmpleados;
@@ -93,6 +114,19 @@ namespace MvcCoreEmpleadosSession.Controllers
         public IActionResult EmpleadosSession()
         {
             return View();
+        }             
+        public IActionResult EmpleadosFavoritos()
+        {
+            if (this.memoryCache.Get("FAVORITOS") == null)
+            {
+                ViewData["MENSAJE"] = "No tiene empleados favoritos";
+                return View();
+            }
+            else
+            {
+                List<Empleado> favoritos = this.memoryCache.Get<List<Empleado>>("FAVORITOS");
+                return View(favoritos);
+            }
         }        
         public IActionResult EmpleadosAlmacenados()
         {
@@ -124,5 +158,6 @@ namespace MvcCoreEmpleadosSession.Controllers
             }
             return View();
         }
+
     }
 }

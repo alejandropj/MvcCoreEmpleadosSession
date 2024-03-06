@@ -18,15 +18,26 @@
     }
 </ul> *@
 
+@using Microsoft.Extensions.Caching.Memory
 @model List<Empleado>
-
+@inject IMemoryCache memoryCache
 @{
     List<int> idempleados = Context.Session.GetObject<List<int>>("IDSEMPLEADOS");
+    List<Empleado> favoritos = memoryCache.Get<List<Empleado>>("FAVORITOS");
 }
 
+@if (favoritos != null){
+<h2 class="bg-warning text-white"> Empleados favoritos: @favoritos.Count</h2>
+}
 <h1 class="text-danger">Empleados Session List Ok</h1>
+@if(idempleados!=null){
+    <h2 class="bg-primary text-white">Empleados en Session: @idempleados.Count</h2>
+}
 <p>
     <a asp-controller="Empleados" asp-action="EmpleadosAlmacenadosOk">Empleados almacenados Session</a>
+</p>
+<p>
+    <a asp-controller="Empleados" asp-action="EmpleadosFavoritos">Empleados Favoritos Cache</a>
 </p>
 
 <h2 style="color:blue">@ViewData["MENSAJE"]</h2>
@@ -36,6 +47,10 @@
     {
         <li class="list-group-item">
             @emp.Apellido
+            <a asp-controller="Empleados" asp-action="SessionEmpleadosOk"
+               asp-route-idfavorito="@emp.IdEmpleado">
+                Favorito
+            </a>
             @if (idempleados == null)
             {
                 <a asp-controller="Empleados" asp-action="SessionEmpleadosOk"

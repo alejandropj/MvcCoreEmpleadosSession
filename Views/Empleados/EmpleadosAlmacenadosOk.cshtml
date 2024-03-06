@@ -1,4 +1,4 @@
-﻿@model List<Empleado>
+﻿@* @model List<Empleado>
 
 <h1>Empleados almacenados OK</h1>
 
@@ -19,13 +19,60 @@ else
     <ul class="list-group">
         @foreach (Empleado emp in Model)
         {
-            <li class="list-group-item">
-                @emp.Apellido, @emp.Oficio, @emp.Salario, <a asp-controller="Empleados" 
-                asp-action="EmpleadosAlmacenadosOk" 
-                asp-route-ideliminar="@emp.IdEmpleado">
-                    Quitar de Session
+            <li class="list-group-item list-group-item-success">
+                @emp.Apellido, @emp.Oficio, @emp.Salario,
+                <a asp-controller="Empleados"
+                   asp-action="EmpleadosAlmacenadosOk"
+                   asp-route-idfavorito="@emp.IdEmpleado">
+                    Favorito
                 </a>
+                
+                @if(idempleados==null){
+                    <a asp-controller="Empleados"
+                       asp-action="EmpleadosAlmacenadosOk"
+                       asp-route-ideliminar="@emp.IdEmpleado">
+                        Quitar de Session
+                    </a>
+                }
             </li>
         }
     </ul>
+} *@
+
+                   @model List<Empleado>
+
+<h1 style="color:fuchsia">
+    Empleados almacenados OK
+</h1>
+
+<p>
+    <a asp-controller="Empleados"
+       asp-action="SessionEmpleadosOk">
+        Almacenar empleados
+    </a>
+</p>
+
+<h2 style="color:red">@ViewData["MENSAJE"]</h2>
+
+@if (Model != null)
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Apellido</th>
+                <th>Oficio</th>
+                <th>Salario</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Empleado emp in Model)
+            {
+                <tr>
+                    <td>@emp.Apellido</td>
+                    <td>@emp.Oficio</td>
+                    <td>@emp.Salario</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }
