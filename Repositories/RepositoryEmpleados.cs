@@ -23,5 +23,35 @@ namespace MvcCoreEmpleadosSession.Repositories
             return await this.context.Empleados.FirstOrDefaultAsync
                 (z=>z.IdEmpleado == idEmpleado);
         }
+        public async Task<List<Empleado>> GetEmpleadosSessionAsync(List<int> ids)
+        {
+            //para realizar un in dentro de linq, debemos hacerlo con Collection.Contaisn(dato a buscar)
+            var consulta = from datos in this.context.Empleados where ids.Contains(datos.IdEmpleado) select datos;
+
+            if (consulta.Count() == 0)
+            {
+                return null;
+            }
+            else
+            {
+                return await consulta.ToListAsync();
+            }
+        }
+        public async Task<List<Empleado>> GetEmpleadosNotSessionAsync(List<int> ids)
+        {
+            //para realizar un in dentro de linq, debemos hacerlo con Collection.Contaisn(dato a buscar)
+            var consulta = from datos in this.context.Empleados 
+                           where ids.Contains(datos.IdEmpleado) == false 
+                           select datos;
+
+            if (consulta.Count() == 0)
+            {
+                return null;
+            }
+            else
+            {
+                return await consulta.ToListAsync();
+            }
+        }
     }
 }

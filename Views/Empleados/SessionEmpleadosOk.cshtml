@@ -1,0 +1,61 @@
+﻿@* @model List<Empleado>
+
+<h1 class="text-danger">Empleados Session List Ok</h1>
+<p>
+    <a asp-controller="Empleados" asp-action="EmpleadosAlmacenadosOk">Empleados almacenados Session</a>
+</p>
+
+<h2 style="color:blue">@ViewData["MENSAJE"]</h2>
+
+<ul class="list-group">
+    @foreach (Empleado emp in Model)
+    {
+        <li class="list-group-item">
+            @emp.Apellido - <a asp-controller="Empleados" asp-action="SessionEmpleadosOk" asp-route-idempleado="@emp.IdEmpleado">
+                Almacenar empleado
+            </a>
+        </li>
+    }
+</ul> *@
+
+@model List<Empleado>
+
+@{
+    List<int> idempleados = Context.Session.GetObject<List<int>>("IDSEMPLEADOS");
+}
+
+<h1 class="text-danger">Empleados Session List Ok</h1>
+<p>
+    <a asp-controller="Empleados" asp-action="EmpleadosAlmacenadosOk">Empleados almacenados Session</a>
+</p>
+
+<h2 style="color:blue">@ViewData["MENSAJE"]</h2>
+
+<ul class="list-group">
+    @foreach (Empleado emp in Model)
+    {
+        <li class="list-group-item">
+            @emp.Apellido
+            @if (idempleados == null)
+            {
+                <a asp-controller="Empleados" asp-action="SessionEmpleadosOk"
+                   asp-route-idempleado="@emp.IdEmpleado">
+                    Almacenar empleado
+                </a>
+            }
+            else{
+                if (idempleados.Contains(emp.IdEmpleado))
+                {
+                    <img src="~/images/ok.png" style="width:35px"/>
+                }
+                else{
+                    <a asp-controller="Empleados" asp-action="SessionEmpleadosOk"
+                       asp-route-idempleado="@emp.IdEmpleado">
+                        Almacenar empleado
+                    </a>
+                }
+            }
+
+        </li>
+    }
+</ul>
