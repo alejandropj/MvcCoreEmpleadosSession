@@ -114,20 +114,34 @@ namespace MvcCoreEmpleadosSession.Controllers
         public IActionResult EmpleadosSession()
         {
             return View();
-        }             
-        public IActionResult EmpleadosFavoritos()
+        }
+
+        public async Task<IActionResult>
+            EmpleadosFavoritos(int? ideliminar)
         {
-            if (this.memoryCache.Get("FAVORITOS") == null)
+            if (ideliminar != null)
             {
-                ViewData["MENSAJE"] = "No tiene empleados favoritos";
-                return View();
+                List<Empleado> empleados =
+                    this.memoryCache.Get<List<Empleado>>("FAVORITOS");
+                //BUSCAMOS AL EMPLEADO
+                Empleado empleado =
+                    empleados.Find(z => z.IdEmpleado == ideliminar.Value);
+                //ELIMINAMOS AL EMPLEADO
+                empleados.Remove(empleado);
+                //PREGUNTAMOS SI NOS QUEDAN FAVORITOS
+                if (empleados.Count == 0)
+                {
+                    //ELIMINAMOS LA KEY FAVORITOS
+                    this.memoryCache.Remove("FAVORITOS");
+                }
+                else
+                {
+                    //ACTUALIZAMOS MEMORYCACHE
+                    this.memoryCache.Set("FAVORITOS", empleados);
+                }
             }
-            else
-            {
-                List<Empleado> favoritos = this.memoryCache.Get<List<Empleado>>("FAVORITOS");
-                return View(favoritos);
-            }
-        }        
+            return View();
+        }
         public IActionResult EmpleadosAlmacenados()
         {
             return View();
